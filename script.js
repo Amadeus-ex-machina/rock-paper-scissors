@@ -64,8 +64,7 @@ function game() {
         while (!(playerSelection == 'rock'
             || playerSelection == 'paper'
             || playerSelection == 'scissors')) {
-            console.log('input was ' + playerSelection);
-            console.log('Invalid input. You must input rock, paper, or scissors!');
+            console.log('Invalid input. Input was ' + playerSelection + '. ' + 'You must input rock, paper, or scissors!');
             playerSelection = prompt('Input rock, paper, or scissors.');
         }
 
