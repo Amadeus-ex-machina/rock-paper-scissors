@@ -1,9 +1,18 @@
+let playerScore = 0;
+let computerScore = 0;
+
+const buttons = document.querySelectorAll('button');
+const display = document.querySelector('.display');
+
+const roundReport = document.createElement('roundReport');
+const scoreReport = document.createElement('scoreReport');
+const winnerReport = document.createElement('winnerReport');
+
 /**
  * Generates computer choice for rock-paper-scissors.
  * @returns {string} Computer choice of rock, paper, or scissors.
  */
 function getComputerChoice() {
-
     // Returns a random integer from 0 to 2.
     const randInt = Math.floor(Math.random() * 3);
 
@@ -22,8 +31,6 @@ function getComputerChoice() {
         default:
             choice = 'rock';
     }
-
-    console.log('Computer chooses ' + choice + '!');
     return choice;
 }
 
@@ -32,67 +39,84 @@ function getComputerChoice() {
  * Player's choice is case-insensitive.
  * @param {string} playerSelection Player's choice.
  * @param {string} computerSelection Computer's choice.
- * @return {string} 0 if player win, 1 if computer win.
+ * @return {string} 0 if player win, 1 if computer win, 2 if tie.
  */
 function playRound(playerSelection, computerSelection) {
     playerSelection = playerSelection.toLowerCase();
+
+    console.log('Player chooses ' + playerSelection + '!');
+    console.log('Computer chooses ' + computerSelection + '!');
 
     let result;
     if ((playerSelection == 'rock' && computerSelection == 'scissors')
         || (playerSelection == 'paper' && computerSelection == 'rock')
         || (playerSelection == 'scissors' && computerSelection == 'paper')) {
-        result = 0;
+        result = 0; // Player win
+    } else if (playerSelection == computerSelection) {
+        result = 2; // Tie
     } else {
-        result = 1;
+        result = 1; // Computer win
     }
     return result;
 }
 
-/**
- * Plays a 5 round game of rock-paper-scissors.
- * Keeps score and reports winner and loser at end.
- */
-function game() {
-    let playerScore = 0;
-    let computerScore = 0;
-    let numRounds = 0;
-
-    while (numRounds < 5) {
-        let playerSelection = prompt('Input rock, paper, or scissors.');
-
-        // Check if playerSelection is valid.
-        while (!(playerSelection == 'rock'
-            || playerSelection == 'paper'
-            || playerSelection == 'scissors')) {
-            console.log('Invalid input. Input was ' + playerSelection + '. ' + 'You must input rock, paper, or scissors!');
-            playerSelection = prompt('Input rock, paper, or scissors.');
-        }
-
-        console.log('Player chooses ' + playerSelection + '!');
-
-        let computerSelection = getComputerChoice();
-
-        if (playRound(playerSelection, computerSelection) == 0) {
-            playerScore++;
-            console.log('Player wins the round!');
-        } else {
-            computerScore++;
-            console.log('Computer wins the round!');
-        }
-        numRounds++;
-    }
-
-    console.log('Player score: ' + playerScore);
-    console.log('Computer score:' + computerScore);
-
-    if (playerScore > computerScore) {
-        console.log('Player wins the game!');
-    }
-
-    if (playerScore < computerScore) {
-        console.log('Computer wins the game!');
-    }
-
+sayScore = (playerScore, computerScore) => {
+    scoreReport.classList.add('displayText');
+    scoreReport.textContent = 'Player score: ' + playerScore + ' ' + 'Computer score: ' + computerScore;
+    display.appendChild(scoreReport);
 }
 
-game()
+sayRound = (playerSelection, computerSelection, roundResult) => {
+    roundReport.classList.add('displayText');
+    if (roundResult == 0) {
+        roundReport.textContent = 'Player wins the round!';
+    } else if (roundResult == 2) {
+        roundReport.textContent = 'Tie!';
+    } else {
+        roundReport.textContent = 'Computer wins the round!';
+    }
+    display.appendChild(roundReport);
+}
+
+sayWinner = () => {
+    if (playerScore > computerScore) {
+        winnerReport.classList.add('friendlyText');
+        winnerReport.textContent = 'Player wins the game!';
+    } else {
+        winnerReport.classList.add('evilText');
+        winnerReport.textContent = 'Computer wins the game!';
+    }
+    display.appendChild(winnerReport);
+}
+
+buttons.forEach((button) => {
+    button.addEventListener('click', () => {
+
+        // Clear display of all children.
+        while (display.firstChild) {
+            display.removeChild(display.firstChild);
+        }
+
+        let playerSelection = button.id;
+        let computerSelection = getComputerChoice();
+
+        roundResult = playRound(playerSelection, computerSelection);
+        if (roundResult == 0) {
+            playerScore++;
+        } else if (roundResult == 1) {
+            computerScore++;
+        } else {
+            // Do nothing.
+        }
+
+        sayRound(playerSelection, computerSelection, roundResult);
+        sayScore(playerScore, computerScore);
+
+        if (playerScore == 5 || computerScore == 5) {
+            sayWinner();
+            // Reset the scores.
+            playerScore = 0;
+            computerScore = 0;
+        }
+    });
+});

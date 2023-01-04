@@ -1,0 +1,15 @@
+.displayText {
+    display: flex;
+}
+
+.friendlyText {
+    font-size: 32px;
+    font-weight: bold;
+    color: blue;
+}
+
+.evilText {
+    font-size: 32px;
+    font-weight: bold;
+    color: red;
+}
